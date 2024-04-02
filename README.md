@@ -25,9 +25,7 @@ The test Android TV project was developed in Android Studio using Kotlin. The bu
     * Directory: your_path</br>
 4. Click on Clone button
 5. Open project
-6. Set external api options here:
-- [BASE_URL](app/src/main/java/com/example/androidtvtestapp/network/ExternalApiOptions.kt#L4-L5)
-- [API_KEY](app/src/main/java/com/example/androidtvtestapp/network/ExternalApiOptions.kt#L5-L6)
+6. Set external api options [here](app/src/main/java/com/example/androidtvtestapp/network/ExternalApiOptions.kt#L4-L5)
 
 ## App in action
 ![](screens/channel.png)
