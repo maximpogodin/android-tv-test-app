@@ -1,0 +1,8 @@
+<resources>
+    <integer name="card_width">210</integer>
+    <integer name="card_height">300</integer>
+    <integer name="timer_delay">3000</integer>
+    <integer name="spinner_width">100</integer>
+    <integer name="spinner_height">100</integer>
+    <integer name="timer_to_card_update">60</integer>
+</resources>
