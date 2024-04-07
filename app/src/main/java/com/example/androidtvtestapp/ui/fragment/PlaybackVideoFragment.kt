@@ -1,6 +1,5 @@
 package com.example.androidtvtestapp.ui.fragment
 
-import com.example.androidtvtestapp.network.RetrofitClient
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -9,14 +8,13 @@ import androidx.leanback.app.VideoSupportFragmentGlueHost
 import androidx.leanback.media.MediaPlayerAdapter
 import androidx.leanback.media.PlaybackTransportControlGlue
 import androidx.leanback.widget.PlaybackControlsRow
+import com.example.androidtvtestapp.model.File
 import com.example.androidtvtestapp.model.Video
-import com.example.androidtvtestapp.model.VideoUrl
-import com.example.androidtvtestapp.network.Api
-import com.example.androidtvtestapp.network.ExternalApiOptions
+import com.example.androidtvtestapp.repository.VideoRepository
 import com.example.androidtvtestapp.ui.activity.BrowseErrorActivity
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class PlaybackVideoFragment (private val video: Video) : VideoSupportFragment() {
 
@@ -36,7 +34,15 @@ class PlaybackVideoFragment (private val video: Video) : VideoSupportFragment() 
         mTransportControlGlue.subtitle = video.description
         mTransportControlGlue.playWhenPrepared()
 
-        playVideo()
+        val firstTrailer = getFirstTrailer(video)
+
+        if (firstTrailer != null) {
+            CoroutineScope(Dispatchers.IO).launch {
+                val trailerUri = getTrailerUri(video.id, firstTrailer.id)
+
+                playVideo(trailerUri)
+            }
+        }
     }
 
     override fun onPause() {
@@ -49,31 +55,27 @@ class PlaybackVideoFragment (private val video: Video) : VideoSupportFragment() 
         mTransportControlGlue.pause()
     }
 
-    private fun playVideo() {
-        val trailerFile = video.files.find { it.name.equals("Trailer", ignoreCase = true) }
+    private fun getFirstTrailer(video : Video): File? {
+        return video.files.find { it.name.equals("Trailer", ignoreCase = true) }
+    }
 
-        if (trailerFile != null) {
-            val api = RetrofitClient.instance.create(Api::class.java)
+    private fun getTrailerUri(videoId : Int, fileId : Int): String? {
+        val repository = VideoRepository()
 
-            api.getVideoUrl(video.id, trailerFile.id, 0, 3, ExternalApiOptions.API_KEY).enqueue(object :
-                Callback<VideoUrl> {
-                override fun onResponse(call: Call<VideoUrl>, response: Response<VideoUrl>) {
-                    if (response.isSuccessful) {
-                        val videoUrl = response.body()
+        return repository.getVideoUrl(videoId, fileId)?.uri
+    }
 
-                        if (videoUrl != null) {
-                            playerAdapter.setDataSource(Uri.parse(videoUrl.uri))
-                        }
-                    }
-                }
-
-                override fun onFailure(call: Call<VideoUrl>, t: Throwable) {}
-            })
+    private fun playVideo(uri : String?) {
+        if (uri != null) {
+            playerAdapter.setDataSource(Uri.parse(uri))
+        } else {
+            showErrorActivity()
         }
-        else {
-            val intent = Intent(activity!!, BrowseErrorActivity::class.java)
-            intent.putExtra("errorMessage", "No trailer available")
-            startActivity(intent)
-        }
+    }
+
+    private fun showErrorActivity() {
+        val intent = Intent(activity!!, BrowseErrorActivity::class.java)
+        intent.putExtra("errorMessage", "No trailer available")
+        startActivity(intent)
     }
 }

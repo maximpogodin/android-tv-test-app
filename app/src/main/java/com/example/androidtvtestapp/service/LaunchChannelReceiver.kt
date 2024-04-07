@@ -8,6 +8,7 @@ class LaunchChannelReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         val serviceIntent = Intent(context, ChannelsLoaderService::class.java)
+        serviceIntent.setAction("CREATE_CHANNEL")
         context.startService(serviceIntent)
     }
 }

@@ -3,6 +3,7 @@ package com.example.androidtvtestapp.ui.activity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Size
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -45,6 +46,7 @@ class BrowseErrorActivity : FragmentActivity() {
             .add(R.id.main_browse_fragment, mSpinnerFragment)
             .commit()
 
+        val timerDelay = resources.getInteger(R.integer.timer_delay)
         val handler = Handler(Looper.myLooper()!!)
         handler.postDelayed({
             supportFragmentManager
@@ -52,7 +54,7 @@ class BrowseErrorActivity : FragmentActivity() {
                 .remove(mSpinnerFragment)
                 .commit()
             mErrorFragment.setErrorContent(text)
-        }, TIMER_DELAY)
+        }, timerDelay.toLong())
     }
 
     class SpinnerFragment : Fragment() {
@@ -61,18 +63,17 @@ class BrowseErrorActivity : FragmentActivity() {
             savedInstanceState: Bundle?
         ): View {
             val progressBar = ProgressBar(container?.context)
+            val spinnerSize = Size(
+                resources.getInteger(R.integer.spinner_width),
+                resources.getInteger(R.integer.spinner_height)
+            )
+
             if (container is FrameLayout) {
                 val layoutParams =
-                    FrameLayout.LayoutParams(SPINNER_WIDTH, SPINNER_HEIGHT, Gravity.CENTER)
+                    FrameLayout.LayoutParams(spinnerSize.width, spinnerSize.height, Gravity.CENTER)
                 progressBar.layoutParams = layoutParams
             }
             return progressBar
         }
-    }
-
-    companion object {
-        private val TIMER_DELAY = 3000L
-        private val SPINNER_WIDTH = 100
-        private val SPINNER_HEIGHT = 100
     }
 }

@@ -1,5 +1,6 @@
 package com.example.androidtvtestapp.ui.presenter
 
+import android.content.Context
 import android.graphics.drawable.Drawable
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -10,7 +11,7 @@ import com.example.androidtvtestapp.R
 import com.example.androidtvtestapp.model.Video
 import kotlin.properties.Delegates
 
-class CardPresenter : Presenter() {
+class CardPresenter (private val context: Context) : Presenter() {
     private var mDefaultCardImage: Drawable? = null
     private var sSelectedBackgroundColor: Int by Delegates.notNull()
     private var sDefaultBackgroundColor: Int by Delegates.notNull()
@@ -31,19 +32,24 @@ class CardPresenter : Presenter() {
         cardView.isFocusable = true
         cardView.isFocusableInTouchMode = true
         updateCardBackgroundColor(cardView, false)
+
         return ViewHolder(cardView)
     }
 
     override fun onBindViewHolder(viewHolder: ViewHolder, item: Any) {
-        val movie = item as Video
+        val video = item as Video
         val cardView = viewHolder.view as ImageCardView
+        val cardSize = arrayOf(
+            context.resources.getInteger(R.integer.card_width),
+            context.resources.getInteger(R.integer.card_height)
+        )
 
-        if (movie.thumbnailSmall.isNotEmpty()) {
-            cardView.titleText = movie.name
-            cardView.contentText = movie.description
-            cardView.setMainImageDimensions(CARD_WIDTH, CARD_HEIGHT)
+        if (video.thumbnailSmall.isNotEmpty()) {
+            cardView.titleText = video.name
+            cardView.contentText = video.description
+            cardView.setMainImageDimensions(cardSize[0], cardSize[1])
             Glide.with(viewHolder.view.context)
-                .load(movie.thumbnailSmall)
+                .load(video.thumbnailSmall)
                 .centerCrop()
                 .error(mDefaultCardImage)
                 .into(cardView.mainImageView)
@@ -60,10 +66,5 @@ class CardPresenter : Presenter() {
         val color = if (selected) sSelectedBackgroundColor else sDefaultBackgroundColor
         view.setBackgroundColor(color)
         view.setInfoAreaBackgroundColor(color)
-    }
-
-    companion object {
-        private val CARD_WIDTH = 210
-        private val CARD_HEIGHT = 300
     }
 }
