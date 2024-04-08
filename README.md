@@ -19,7 +19,7 @@ The test Android TV project was developed in Android Studio using Kotlin. The bu
 2. Select "Get from Version Control"
 3. Configure properties:
     * Version control: Git
-    * URL: [[https://github.com/maximpogodin/swapi-android](https://github.com/maximpogodin/android-tv-test-app)
+    * URL:(https://github.com/maximpogodin/android-tv-test-app)
     * Directory: your_path</br>
 4. Click on Clone button
 5. Open project
